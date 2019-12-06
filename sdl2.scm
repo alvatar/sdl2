@@ -1,9 +1,9 @@
 ;;!!! SDL2 Foreign Function Interface
 ;; .author Alvaro Castro-Castilla, 2015-2019
 
-(include "c-define-base-macros#.scm")
-(include "c-define-struct#.scm" )
-(include "types#.scm")
+(include "ffi-macros/c-define-base-macros#.scm")
+(include "ffi-macros/c-define-struct#.scm" )
+(include "ffi-macros/types#.scm")
 (include "sdl2-prelude.scm")
 
 (declare (extended-bindings)) ;; ##fx+ is bound to fixnum addition, etc
