@@ -30,19 +30,19 @@
  )
 
 (define SDL_AUDIO_BITSIZE
-  (c-lambda (SDL_AudioFormat) SDL_AudioFormat "___result = SDL_AUDIO_BITSIZE(___arg1);"))
+  (c-lambda (SDL_AudioFormat) SDL_AudioFormat "___return(SDL_AUDIO_BITSIZE(___arg1));"))
 (define SDL_AUDIO_ISFLOAT
-  (c-lambda (SDL_AudioFormat) SDL_AudioFormat "___result = SDL_AUDIO_ISFLOAT(___arg1);"))
+  (c-lambda (SDL_AudioFormat) SDL_AudioFormat "___return(SDL_AUDIO_ISFLOAT(___arg1));"))
 (define SDL_AUDIO_ISBIGENDIAN
-  (c-lambda (SDL_AudioFormat) SDL_AudioFormat "___result = SDL_AUDIO_ISBIGENDIAN(___arg1);"))
+  (c-lambda (SDL_AudioFormat) SDL_AudioFormat "___return(SDL_AUDIO_ISBIGENDIAN(___arg1));"))
 (define SDL_AUDIO_ISSIGNED
-  (c-lambda (SDL_AudioFormat) SDL_AudioFormat "___result = SDL_AUDIO_ISSIGNED(___arg1);"))
+  (c-lambda (SDL_AudioFormat) SDL_AudioFormat "___return(SDL_AUDIO_ISSIGNED(___arg1));"))
 (define SDL_AUDIO_ISINT
-  (c-lambda (SDL_AudioFormat) SDL_AudioFormat "___result = SDL_AUDIO_ISINT(___arg1);"))
+  (c-lambda (SDL_AudioFormat) SDL_AudioFormat "___return(SDL_AUDIO_ISINT(___arg1));"))
 (define SDL_AUDIO_ISLITTLEENDIAN
-  (c-lambda (SDL_AudioFormat) SDL_AudioFormat "___result = SDL_AUDIO_ISLITTLEENDIAN(___arg1);"))
+  (c-lambda (SDL_AudioFormat) SDL_AudioFormat "___return(SDL_AUDIO_ISLITTLEENDIAN(___arg1));"))
 (define SDL_AUDIO_ISUNSIGNED
-  (c-lambda (SDL_AudioFormat) SDL_AudioFormat "___result = SDL_AUDIO_ISUNSIGNED(___arg1);"))
+  (c-lambda (SDL_AudioFormat) SDL_AudioFormat "___return(SDL_AUDIO_ISUNSIGNED(___arg1));"))
 
 (c-define-constants
  AUDIO_U8
@@ -755,21 +755,21 @@
  )
 
 (define SDL_PIXELTYPE
-  (c-lambda (int) int "___result = SDL_PIXELTYPE(___arg1);"))
+  (c-lambda (int) int "___return(SDL_PIXELTYPE(___arg1));"))
 (define SDL_PIXELORDER
-  (c-lambda (int) int "___result = SDL_PIXELORDER(___arg1);"))
+  (c-lambda (int) int "___return(SDL_PIXELORDER(___arg1));"))
 (define SDL_PIXELLAYOUT
-  (c-lambda (int) int "___result = SDL_PIXELLAYOUT(___arg1);"))
+  (c-lambda (int) int "___return(SDL_PIXELLAYOUT(___arg1));"))
 (define SDL_BITSPERPIXEL
-  (c-lambda (int) int "___result = SDL_BITSPERPIXEL(___arg1);"))
+  (c-lambda (int) int "___return(SDL_BITSPERPIXEL(___arg1));"))
 (define SDL_BYTESPERPIXEL
-  (c-lambda (int) int "___result = SDL_BYTESPERPIXEL(___arg1);"))
+  (c-lambda (int) int "___return(SDL_BYTESPERPIXEL(___arg1));"))
 (define SDL_ISPIXELFORMAT_INDEXED
-  (c-lambda (int) int "___result = SDL_ISPIXELFORMAT_INDEXED(___arg1);"))
+  (c-lambda (int) int "___return(SDL_ISPIXELFORMAT_INDEXED(___arg1));"))
 (define SDL_ISPIXELFORMAT_ALPHA
-  (c-lambda (int) int "___result = SDL_ISPIXELFORMAT_ALPHA(___arg1);"))
+  (c-lambda (int) int "___return(SDL_ISPIXELFORMAT_ALPHA(___arg1));"))
 (define SDL_ISPIXELFORMAT_FOURCC
-  (c-lambda (int) int "___result = SDL_ISPIXELFORMAT_FOURCC(___arg1);"))
+  (c-lambda (int) int "___return(SDL_ISPIXELFORMAT_FOURCC(___arg1));"))
 
 (c-define-constants
  SDL_PIXELTYPE_UNKNOWN

@@ -153,7 +153,7 @@
                                    (interval 0 nb-names)
                                    names))
                        "};\n"
-                       "___result = _tmp_[___arg1];\n")))
+                       "___return(_tmp_[___arg1]);\n")))
          ,@(map (lambda (i name)
                   `(##define ,name (,wrapper ,i)))
                 (interval 0 nb-names)
@@ -165,7 +165,7 @@
   (let ((c-type (%%get-key-arg rest c-type: (symbol->string scheme-type))))
     `(define ,(string->symbol (string-append (symbol->string scheme-type) "-size"))
        ((c-lambda () size-t
-                  ,(string-append "___result = sizeof(" c-type ");"))))))
+                  ,(string-append "___return(sizeof(" c-type "));"))))))
 
 ;;! Build FFI procedures for C type arrays. Only for use with basic types, not structs.
 ;; (c-define-array float f32) ->
@@ -201,25 +201,25 @@
               `(define ,(%%generic-symbol-append 'alloc- scheme-type '*/unmanaged)
                  (c-lambda (size-t)
                            ,type*/nonnull
-                           ,(%%generic-string-append "___result_voidstar = malloc(___arg1*sizeof(" c-type "));")))
+                           ,(%%generic-string-append "___return(malloc(___arg1*sizeof(" c-type ")));")))
               ;; Alloc unmanaged by Gambit's GC
               `(define ,(%%generic-symbol-append 'alloc- scheme-type '*)
                  (c-lambda (size-t)
                            ,type*/release-rc
                            ;; ,(%%generic-string-append "___result_voidstar = ___EXT(___alloc_rc)(___arg1*sizeof(" c-type "));")
-                           ,(%%generic-string-append "___result_voidstar = malloc(___arg1*sizeof(" c-type "));")))
+                           ,(%%generic-string-append "___return(malloc(___arg1*sizeof(" c-type ")));")))
               `(define ,(%%generic-symbol-append scheme-type '*-ref)
                  (c-lambda (,type*/nonnull size-t)
                            ,scheme-type
-                           "___result = ___arg1[___arg2];"))
+                           "___return(___arg1[___arg2]);"))
               `(define ,(%%generic-symbol-append scheme-type '*-set!)
                  (c-lambda (,type*/nonnull size-t ,scheme-type)
                            void
-                           "___arg1[___arg2] = ___arg3;"))
+                           "___arg1[___arg2] = ___arg3; ___return;"))
               `(define ,(%%generic-symbol-append '*-> scheme-type)
                  (c-lambda (,type*/nonnull)
                            ,scheme-type
-                           "___result = *___arg1;"))
+                           "___return(*___arg1);"))
               (if scheme-vector
                   `(define (,(%%generic-symbol-append scheme-vector 'vector-> scheme-type '*) vec)
                      (let* ((length (,(%%generic-symbol-append scheme-vector 'vector-length) vec))
@@ -304,40 +304,40 @@
                  `((define ,(%%generic-symbol-append type-str "-" field-str)
                      (c-lambda (,type*/nonnull)
                                ,(%%generic-symbol-append field-type-str "*/nonnull")
-                               ,(string-append "___result_voidstar = &___arg1->" field-str ";")))
+                               ,(string-append "___return(&___arg1->" field-str ");")))
 
                    (define ,(%%generic-symbol-append type-str "-" field-str "-set!")
                      (c-lambda (,type*/nonnull ,field-type)
                                void
-                               ,(string-append "___arg1->" field-str " = ___arg2;")))))
+                               ,(string-append "___arg1->" field-str " = ___arg2; ___return;")))))
                 ;; Array of fundamental type
                 ((array)
                  ;; generate a getter and a setter
                  `((define ,(%%generic-symbol-append type-str "-" field-str "-ref")
                      (c-lambda (,type*/nonnull int)
                                ,field-type
-                               ,(string-append "___result = ___arg1->" field-str "[___arg2];")))
+                               ,(string-append "___return(___arg1->" field-str "[___arg2]);")))
                    (define ,(%%generic-symbol-append type-str "-" field-str "-set!")
                      (c-lambda (,type*/nonnull int ,field-type)
                                void
-                               ,(string-append "___arg1->" field-str "[___arg2] = ___arg3;")))))
+                               ,(string-append "___arg1->" field-str "[___arg2] = ___arg3; ___return;")))))
                 ;; Array of structs
                 ((struct-array)
                  ;; only generate a getter returning struct address
                  `((define ,(%%generic-symbol-append type-str "-" field-str "-ref")
                      (c-lambda (,type*/nonnull int)
                                ,(%%generic-symbol-append field-type-str "*/nonnull")
-                               ,(string-append "___result_voidstar = &___arg1->" field-str "[___arg2];")))))))
+                               ,(string-append "___return(&___arg1->" field-str "[___arg2]);")))))))
             ;; Field is fundamental type
             `((define ,(%%generic-symbol-append type-str "-" field-str)
                 (c-lambda (,type*/nonnull)
                           ,field-description
-                          ,(string-append "___result = ___arg1->" field-str ";")))
+                          ,(string-append "___return(___arg1->" field-str ");")))
 
               (define ,(%%generic-symbol-append type-str "-" field-str "-set!")
                 (c-lambda (,type*/nonnull ,field-description)
                           void
-                          ,(string-append "___arg1->" field-str " = ___arg2;")))))))
+                          ,(string-append "___arg1->" field-str " = ___arg2; ___return;")))))))
     (let ((expansion
            `(begin
               ;; Define the release function which is called when the
@@ -353,12 +353,12 @@
               (define ,(%%generic-symbol-append "alloc-" type-str)
                 (c-lambda ()
                           ,type*/release-rc
-                          ,(string-append "___result_voidstar = ___EXT(___alloc_rc)( sizeof( " struct-type-str " ) );")))
+                          ,(string-append "___return(___EXT(___alloc_rc)(sizeof(" struct-type-str " )));")))
               ;; Dereference
               (define ,(%%generic-symbol-append "*->" type-str)
                 (c-lambda (,type*/nonnull)
                           ,type
-                          ,(string-append "___result_voidstar = (" type-str "*)___arg1;")))
+                          ,(string-append "___return((" type-str "*)___arg1);")))
               ;; Define field getters and setters.
               ,@(apply append (map field-getter-setter fields)))))
       (if #f ;; #t for debugging
