@@ -1,10 +1,9 @@
-;;!!! SDL_Image2 Foreign Function Interface
-;; .author Alvaro Castro-Castilla, 2013-2015
+;;!!! SDL_TTF Foreign Function Interface
+;; .author Alvaro Castro-Castilla, 2013-2019
 
-(include (spheres/gambit/ffi c-define-base-macros#))
-(include (spheres/gambit/ffi c-define-struct#))
-(include (spheres/gambit/ffi types#))
-(include "sdl2-prelude.scm")
+(include "../ffi-macros/c-define-base-macros#.scm")
+(include "../ffi-macros/types#.scm")
+(include "../sdl2-prelude.scm")
 
 (c-declare "#include \"SDL_ttf.h\"")
 
@@ -17,8 +16,14 @@
 (define TTF_Init
   (c-lambda () int "TTF_Init"))
 
+(define TTF_Quit
+  (c-lambda () void "TTF_Quit"))
+
 (define TTF_OpenFont
   (c-lambda (char-string int) TTF_Font* "TTF_OpenFont"))
+
+(define TTF_CloseFont
+  (c-lambda (TTF_Font*) void "TTF_CloseFont"))
 
 (define TTF_RenderText_Blended
   (c-lambda (TTF_Font* char-string SDL_Color) SDL_Surface* "TTF_RenderText_Blended"))

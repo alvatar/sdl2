@@ -192,9 +192,9 @@
                 ,(string-append
                   "static ___SCMOBJ " release-type-str "( void* ptr )\n"
                   "{\n"
-                  ;; " printf(\"GC called free()!\\n\");\n"
-                  ;; "  ___EXT(___release_rc)( ptr );\n"
-                  "  free( ptr );\n"
+                  " printf(\"GC called ___release_rc() for " release-type-str "!\\n\");\n"
+                  "  ___EXT(___release_rc)( ptr );\n"
+                  ;;"  free( ptr );\n"
                   "  return ___FIX(___NO_ERR);\n"
                   "}\n"))
               ;; Alloc managed by Gambit's GC
@@ -207,7 +207,7 @@
                  (c-lambda (size-t)
                            ,type*/release-rc
                            ;; ,(%%generic-string-append "___result_voidstar = ___EXT(___alloc_rc)(___arg1*sizeof(" c-type "));")
-                           ,(%%generic-string-append "___return(malloc(___arg1*sizeof(" c-type ")));")))
+                           ,(%%generic-string-append "___return(___EXT(___alloc_rc)(___arg1*sizeof(" c-type ")));")))
               `(define ,(%%generic-symbol-append scheme-type '*-ref)
                  (c-lambda (,type*/nonnull size-t)
                            ,scheme-type
@@ -346,6 +346,7 @@
                ,(string-append
                  "static ___SCMOBJ " release-type-str "( void* ptr )\n"
                  "{\n"
+                 " printf(\"GC called ___release_rc() for " release-type-str "!\\n\");\n"
                  "  ___EXT(___release_rc)( ptr );\n"
                  "  return ___FIX(___NO_ERR);\n"
                  "}\n"))
@@ -358,7 +359,7 @@
               (define ,(%%generic-symbol-append "*->" type-str)
                 (c-lambda (,type*/nonnull)
                           ,type
-                          ,(string-append "___return((" type-str "*)___arg1);")))
+                          "___return(*___arg1);"))
               ;; Define field getters and setters.
               ,@(apply append (map field-getter-setter fields)))))
       (if #f ;; #t for debugging

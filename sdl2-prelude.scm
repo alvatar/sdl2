@@ -5,6 +5,18 @@
 ;; Include this file explicitly for the SDL_SysWMinfo declaration
 (c-declare "#include \"SDL2/SDL_syswm.h\"")
 
+
+(c-define-type size-t unsigned-int)
+(c-define-type void* (pointer void))
+(c-define-type void** (pointer void*))
+(c-define-type unsigned-int8* (pointer unsigned-int8))
+(c-define-type unsigned-int8** (pointer unsigned-int8*))
+(c-define-type unsigned-int16* (pointer unsigned-int16))
+(c-define-type float* (pointer float))
+(c-define-type int* (pointer int))
+(c-define-type unsigned-int32* (pointer unsigned-int32))
+
+
 ;; We need to declare these structs, otherwise we get an
 ;; incomplete type 'struct SDL_DisplayMode' error
 (c-declare #<<end-of-string
