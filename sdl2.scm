@@ -6,7 +6,7 @@
 
 (declare (extended-bindings)) ;; ##fx+ is bound to fixnum addition, etc
 (declare (not safe))          ;; claim code has no type errors
-(declare (block))             ;; claim no global is assigned (such as hamt?)
+(declare (block))             ;; claim no global is assigned
 
 (c-define-constants
  SDL_INIT_TIMER
@@ -1373,29 +1373,41 @@
   (define SDL_AtomicTryLock (c-lambda (SDL_SpinLock*) SDL_bool "SDL_AtomicTryLock"))
   (define SDL_AtomicUnlock (c-lambda (SDL_SpinLock*) void "SDL_AtomicUnlock")))
  (else #!void))
-(define SDL_AudioInit (c-lambda (nonnull-char-string) int "SDL_AudioInit"))
-(define SDL_AudioQuit (c-lambda () void "SDL_AudioQuit"))
 (define SDL_BlitScaled (c-lambda (SDL_Surface* SDL_Rect* SDL_Surface* SDL_Rect*) int "SDL_BlitScaled"))
 (define SDL_BlitSurface (c-lambda (SDL_Surface* SDL_Rect* SDL_Surface* SDL_Rect*) int "SDL_BlitSurface"))
-(define SDL_BuildAudioCVT (c-lambda (SDL_AudioCVT* SDL_AudioFormat unsigned-int8 int SDL_AudioFormat unsigned-int8 int) int "SDL_BuildAudioCVT"))
 (define SDL_CalculateGammaRamp (c-lambda (float unsigned-int16*) void "SDL_CalculateGammaRamp"))
 (define SDL_ClearError (c-lambda () void "SDL_ClearError"))
 (define SDL_ClearHints (c-lambda () void "SDL_ClearHints"))
-(define SDL_CloseAudio (c-lambda () void "SDL_CloseAudio"))
-(define SDL_CloseAudioDevice (c-lambda (SDL_AudioDeviceID) void "SDL_CloseAudioDevice"))
-(define SDL_CompilerBarrier (c-lambda () void "SDL_CompilerBarrier"))
-(define SDL_CondBroadcast (c-lambda (SDL_cond*) int "SDL_CondBroadcast"))
-(define SDL_CondSignal (c-lambda (SDL_cond*) int "SDL_CondSignal"))
-(define SDL_CondWait (c-lambda (SDL_cond* SDL_mutex*) int "SDL_CondWait"))
-(define SDL_CondWaitTimeout (c-lambda (SDL_cond* SDL_mutex* unsigned-int32) int "SDL_CondWaitTimeout"))
-(define SDL_ConvertAudio (c-lambda (SDL_AudioCVT*) int "SDL_ConvertAudio"))
+(cond-expand
+ (sdl:audio
+  (define SDL_AudioInit (c-lambda (nonnull-char-string) int "SDL_AudioInit"))
+  (define SDL_AudioQuit (c-lambda () void "SDL_AudioQuit"))
+  (define SDL_BuildAudioCVT (c-lambda (SDL_AudioCVT* SDL_AudioFormat unsigned-int8 int SDL_AudioFormat unsigned-int8 int) int "SDL_BuildAudioCVT"))
+  (define SDL_CloseAudio (c-lambda () void "SDL_CloseAudio"))
+  (define SDL_CloseAudioDevice (c-lambda (SDL_AudioDeviceID) void "SDL_CloseAudioDevice")))
+ (else #!void))
+(cond-expand
+ (sdl:threads
+  (define SDL_CompilerBarrier (c-lambda () void "SDL_CompilerBarrier"))
+  (define SDL_CondBroadcast (c-lambda (SDL_cond*) int "SDL_CondBroadcast"))
+  (define SDL_CondSignal (c-lambda (SDL_cond*) int "SDL_CondSignal"))
+  (define SDL_CondWait (c-lambda (SDL_cond* SDL_mutex*) int "SDL_CondWait"))
+  (define SDL_CondWaitTimeout (c-lambda (SDL_cond* SDL_mutex* unsigned-int32) int "SDL_CondWaitTimeout")))
+ (else #!void))
+(cond-expand
+ (sdl:audio
+  (define SDL_ConvertAudio (c-lambda (SDL_AudioCVT*) int "SDL_ConvertAudio")))
+ (else #!void))
 (define SDL_ConvertPixels (c-lambda (int int unsigned-int32 void* int unsigned-int32 void* int) int "SDL_ConvertPixels"))
 (define SDL_ConvertSurface (c-lambda (SDL_Surface* SDL_PixelFormat* unsigned-int32) SDL_Surface* "SDL_ConvertSurface"))
 (define SDL_ConvertSurfaceFormat (c-lambda (SDL_Surface* unsigned-int32 unsigned-int32) SDL_Surface* "SDL_ConvertSurfaceFormat"))
 (define SDL_CreateColorCursor (c-lambda (SDL_Surface* int int) SDL_Cursor* "SDL_CreateColorCursor"))
-(define SDL_CreateCond (c-lambda () SDL_cond* "SDL_CreateCond"))
+(cond-expand
+ (sdl:threads
+  (define SDL_CreateCond (c-lambda () SDL_cond* "SDL_CreateCond"))
+  (define SDL_CreateMutex (c-lambda () SDL_mutex* "SDL_CreateMutex")))
+ (else #!void))
 (define SDL_CreateCursor (c-lambda (unsigned-int8* unsigned-int8* int int int int) SDL_Cursor* "SDL_CreateCursor"))
-(define SDL_CreateMutex (c-lambda () SDL_mutex* "SDL_CreateMutex"))
 (define SDL_CreateRGBSurface (c-lambda (unsigned-int32 int int int unsigned-int32 unsigned-int32 unsigned-int32 unsigned-int32) SDL_Surface* "SDL_CreateRGBSurface"))
 (define SDL_CreateRGBSurfaceFrom (c-lambda (void* int int int int unsigned-int32 unsigned-int32 unsigned-int32 unsigned-int32) SDL_Surface* "SDL_CreateRGBSurfaceFrom"))
 (define SDL_CreateRenderer (c-lambda (SDL_Window* int unsigned-int32) SDL_Renderer* "SDL_CreateRenderer"))
@@ -1477,10 +1489,6 @@
   (define SDL_GameControllerGetBindForButton (c-lambda (SDL_GameController* SDL_GameControllerButton) SDL_GameControllerButtonBind "SDL_GameControllerGetBindForButton"))
   (define SDL_GameControllerGetButton (c-lambda (SDL_GameController* SDL_GameControllerButton) unsigned-int8 "SDL_GameControllerGetButton"))
   (define SDL_GameControllerGetButtonFromString (c-lambda (nonnull-char-string) SDL_GameControllerButton "SDL_GameControllerGetButtonFromString"))
-  (cond-expand
-   (sdl:joystick
-    (define SDL_GameControllerGetJoystick (c-lambda (SDL_GameController*) SDL_Joystick* "SDL_GameControllerGetJoystick")))
-   (else #!void))
   (define SDL_GameControllerGetStringForAxis (c-lambda (SDL_GameControllerAxis) nonnull-char-string "SDL_GameControllerGetStringForAxis"))
   (define SDL_GameControllerGetStringForButton (c-lambda (SDL_GameControllerButton) nonnull-char-string "SDL_GameControllerGetStringForButton"))
   (define SDL_GameControllerMapping (c-lambda (SDL_GameController*) nonnull-char-string "SDL_GameControllerMapping"))
@@ -1491,13 +1499,20 @@
   (define SDL_GameControllerUpdate (c-lambda () void "SDL_GameControllerUpdate")))
  (else #!void))
 (cond-expand
+ (sdl:joystick
+  (define SDL_GameControllerGetJoystick (c-lambda (SDL_GameController*) SDL_Joystick* "SDL_GameControllerGetJoystick")))
+ (else #!void))
+(cond-expand
  (sdl:assert
   (define SDL_GetAssertionReport (c-lambda () SDL_assert_data* "SDL_GetAssertionReport")))
  (else #!void))
-(define SDL_GetAudioDeviceName (c-lambda (int int) nonnull-char-string "SDL_GetAudioDeviceName"))
-(define SDL_GetAudioDeviceStatus (c-lambda (SDL_AudioDeviceID) SDL_AudioStatus "SDL_GetAudioDeviceStatus"))
-(define SDL_GetAudioDriver (c-lambda (int) nonnull-char-string "SDL_GetAudioDriver"))
-(define SDL_GetAudioStatus (c-lambda () SDL_AudioStatus "SDL_GetAudioStatus"))
+(cond-expand
+ (sdl:audio
+  (define SDL_GetAudioDeviceName (c-lambda (int int) nonnull-char-string "SDL_GetAudioDeviceName"))
+  (define SDL_GetAudioDeviceStatus (c-lambda (SDL_AudioDeviceID) SDL_AudioStatus "SDL_GetAudioDeviceStatus"))
+  (define SDL_GetAudioDriver (c-lambda (int) nonnull-char-string "SDL_GetAudioDriver"))
+  (define SDL_GetAudioStatus (c-lambda () SDL_AudioStatus "SDL_GetAudioStatus")))
+ (else #!void))
 (define SDL_GetBasePath (c-lambda () nonnull-char-string "SDL_GetBasePath"))
 (define SDL_GetCPUCacheLineSize (c-lambda () int "SDL_GetCPUCacheLineSize"))
 (define SDL_GetCPUCount (c-lambda () int "SDL_GetCPUCount"))
@@ -1689,9 +1704,15 @@
 (define SDL_LoadObject (c-lambda (nonnull-char-string) void* "SDL_LoadObject"))
 (define SDL_LoadWAV (c-lambda (nonnull-char-string SDL_AudioSpec* unsigned-int8** unsigned-int32*) SDL_AudioSpec* "SDL_LoadWAV"))
 (define SDL_LoadWAV_RW (c-lambda (SDL_RWops* int SDL_AudioSpec* unsigned-int8** unsigned-int32*) SDL_AudioSpec* "SDL_LoadWAV_RW"))
-(define SDL_LockAudio (c-lambda () void "SDL_LockAudio"))
-(define SDL_LockAudioDevice (c-lambda (SDL_AudioDeviceID) void "SDL_LockAudioDevice"))
-(define SDL_LockMutex (c-lambda (SDL_mutex*) int "SDL_LockMutex"))
+(cond-expand
+ (sdl:audio
+  (define SDL_LockAudio (c-lambda () void "SDL_LockAudio"))
+  (define SDL_LockAudioDevice (c-lambda (SDL_AudioDeviceID) void "SDL_LockAudioDevice")))
+ (else #!void))
+(cond-expand
+ (sdl:threads
+  (define SDL_LockMutex (c-lambda (SDL_mutex*) int "SDL_LockMutex")))
+ (else #!void))
 (define SDL_LockSurface (c-lambda (SDL_Surface*) int "SDL_LockSurface"))
 (define SDL_LockTexture (c-lambda (SDL_Texture* SDL_Rect* void** int*) int "SDL_LockTexture"))
 (define SDL_Log (c-lambda (nonnull-char-string) void "SDL_Log(\"%s\", ___arg1);"))
@@ -1725,10 +1746,13 @@
  (sdl:joystick
   (define SDL_NumJoysticks (c-lambda () int "SDL_NumJoysticks")))
  (else #!void))
-(define SDL_OpenAudio (c-lambda (SDL_AudioSpec* SDL_AudioSpec*) int "SDL_OpenAudio"))
-(define SDL_OpenAudioDevice (c-lambda (nonnull-char-string int SDL_AudioSpec* SDL_AudioSpec* int) SDL_AudioDeviceID "SDL_OpenAudioDevice"))
-(define SDL_PauseAudio (c-lambda (int) void "SDL_PauseAudio"))
-(define SDL_PauseAudioDevice (c-lambda (SDL_AudioDeviceID int) void "SDL_PauseAudioDevice"))
+(cond-expand
+ (sdl:audio
+  (define SDL_OpenAudio (c-lambda (SDL_AudioSpec* SDL_AudioSpec*) int "SDL_OpenAudio"))
+  (define SDL_OpenAudioDevice (c-lambda (nonnull-char-string int SDL_AudioSpec* SDL_AudioSpec* int) SDL_AudioDeviceID "SDL_OpenAudioDevice"))
+  (define SDL_PauseAudio (c-lambda (int) void "SDL_PauseAudio"))
+  (define SDL_PauseAudioDevice (c-lambda (SDL_AudioDeviceID int) void "SDL_PauseAudioDevice")))
+ (else #!void))
 (define SDL_PeepEvents (c-lambda (SDL_Event* int SDL_eventaction unsigned-int32 unsigned-int32) int "SDL_PeepEvents"))
 (define SDL_PixelFormatEnumToMasks (c-lambda (unsigned-int32 int* unsigned-int32* unsigned-int32* unsigned-int32* unsigned-int32*) SDL_bool "SDL_PixelFormatEnumToMasks"))
 (define SDL_PollEvent (c-lambda (SDL_Event*) int "SDL_PollEvent"))
@@ -1868,14 +1892,20 @@
   (define SDL_TLSCreate (c-lambda () SDL_TLSID "SDL_TLSCreate"))
   (define SDL_TLSGet (c-lambda (SDL_TLSID) void* "SDL_TLSGet"))
   (define SDL_ThreadID (c-lambda () SDL_threadID "SDL_ThreadID")))
+ (define SDL_TryLockMutex (c-lambda (SDL_mutex*) int "SDL_TryLockMutex"))
  (else #!void))
 (define SDL_TriggerBreakpoint (c-lambda () void "SDL_TriggerBreakpoint"))
-(define SDL_TryLockMutex (c-lambda (SDL_mutex*) int "SDL_TryLockMutex"))
 (define SDL_UnionRect (c-lambda (SDL_Rect* SDL_Rect* SDL_Rect*) void "SDL_UnionRect"))
 (define SDL_UnloadObject (c-lambda (void*) void "SDL_UnloadObject"))
-(define SDL_UnlockAudio (c-lambda () void "SDL_UnlockAudio"))
-(define SDL_UnlockAudioDevice (c-lambda (SDL_AudioDeviceID) void "SDL_UnlockAudioDevice"))
-(define SDL_UnlockMutex (c-lambda (SDL_mutex*) int "SDL_UnlockMutex"))
+(cond-expand
+ (sdl:audio
+  (define SDL_UnlockAudio (c-lambda () void "SDL_UnlockAudio"))
+  (define SDL_UnlockAudioDevice (c-lambda (SDL_AudioDeviceID) void "SDL_UnlockAudioDevice")))
+ (else #!void))
+(cond-expand
+ (sdl:threads
+  (define SDL_UnlockMutex (c-lambda (SDL_mutex*) int "SDL_UnlockMutex")))
+ (else #!void))
 (define SDL_UnlockSurface (c-lambda (SDL_Surface*) void "SDL_UnlockSurface"))
 (define SDL_UnlockTexture (c-lambda (SDL_Texture*) void "SDL_UnlockTexture"))
 (define SDL_UpdateTexture (c-lambda (SDL_Texture* SDL_Rect* void* int) int "SDL_UpdateTexture"))

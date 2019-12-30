@@ -1,8 +1,7 @@
 ;;!!! SDL_TTF Foreign Function Interface
 ;; .author Alvaro Castro-Castilla, 2013-2019
 
-(include "../ffi-macros/c-define-base-macros#.scm")
-(include "../ffi-macros/types#.scm")
+(include "../c-define-base-macros#.scm")
 (include "../sdl2-prelude.scm")
 
 (c-declare "#include \"SDL_ttf.h\"")

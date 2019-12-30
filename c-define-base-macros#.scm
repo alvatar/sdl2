@@ -1,29 +1,5 @@
 ;;!!! Simple FFI generation macros
-;; .author Álvaro Castro Castilla, 2013-2015. All Rights Reserved.
-
-;;------------------------------------------------------------------------------
-;;!! Old stuff to keep in mind
-
-;; This nasty hack substitutes the '() for ()
-;; It turns out that Gambit uses () for argument lists, which is not an acceptable
-;; syntax for most syntax-rules expanders
-;; (define-macro (c-lambda . body)
-;;   `(##c-lambda ,@(map (lambda (f) (if (and (pair? f)
-;;                                       (pair? (cdr f))
-;;                                       (eq? (cadr f) '()))
-;;                                  '()
-;;                                  f))
-;;                       body)))
-
-;; ;; The same for c-define
-;; (define-macro (c-define . body)
-;;   `(##c-define ,@(map (lambda (f) (if (and (pair? f)
-;;                                       (pair? (cdr f))
-;;                                       (eq? (cadr f) '()))
-;;                                  '()
-;;                                  f))
-;;                       body)))
-
+;; .author Álvaro Castro Castilla, 2013-2019. All Rights Reserved.
 
 ;;------------------------------------------------------------------------------
 ;;!! Prelude
@@ -192,7 +168,7 @@
                 ,(string-append
                   "static ___SCMOBJ " release-type-str "( void* ptr )\n"
                   "{\n"
-                  " printf(\"GC called ___release_rc() for " release-type-str "!\\n\");\n"
+                  " printf(\"GC called " release-type-str "()\\n\");\n"
                   "  ___EXT(___release_rc)( ptr );\n"
                   ;;"  free( ptr );\n"
                   "  return ___FIX(___NO_ERR);\n"
@@ -346,7 +322,7 @@
                ,(string-append
                  "static ___SCMOBJ " release-type-str "( void* ptr )\n"
                  "{\n"
-                 " printf(\"GC called ___release_rc() for " release-type-str "!\\n\");\n"
+                 " printf(\"GC called " release-type-str "()\\n\");\n"
                  "  ___EXT(___release_rc)( ptr );\n"
                  "  return ___FIX(___NO_ERR);\n"
                  "}\n"))
