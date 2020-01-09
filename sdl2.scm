@@ -9,6 +9,9 @@
 (declare (block))             ;; claim no global is assigned
 
 (c-define-constants
+ SDL_GL_CONTEXT_EGL)
+
+(c-define-constants
  SDL_INIT_TIMER
  SDL_INIT_AUDIO
  SDL_INIT_VIDEO

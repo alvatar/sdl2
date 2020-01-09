@@ -1,4 +1,4 @@
-(define-library (github.com/alvatar/sdl2)
+(define-library (sdl2)
 
   (import (gambit))
 
@@ -7,6 +7,8 @@
   (pkg-config "sdl2")
 
   (export
+   SDL_GL_CONTEXT_EGL
+
    SDL_INIT_TIMER
    SDL_INIT_AUDIO
    SDL_INIT_VIDEO
